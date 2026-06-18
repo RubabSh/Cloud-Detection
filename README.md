@@ -1,574 +1,231 @@
-# \# AI-Based Cloud Detection – POC
+# ☁️ AI-Based Cloud Detection for Satellite Imagery
 
-# 
+## Overview
 
-# \## Overview
+**AI-Based Cloud Detection** is a deep learning-based cloud segmentation and classification system designed for high-resolution optical satellite imagery.
 
-# 
+The solution automatically detects cloud-covered regions and classifies satellite images as **Cloudy** or **No Cloud** before downstream processing or transmission.
 
-# \*\*AI-Based Cloud Detection – POC\*\* is a deep learning-based cloud segmentation and classification system developed for satellite imagery. The project aims to automatically detect cloud-covered regions in high-resolution optical satellite images and classify images as \*\*Cloudy\*\* or \*\*No Cloud\*\* before further processing or transmission.
+Cloud detection is a critical preprocessing step in remote sensing workflows, as cloud cover can obscure surface information and reduce the usability of optical imagery. Early cloud identification enables more efficient data processing, storage, and transmission.
 
-# 
+---
 
-# Cloud detection is an essential preprocessing step in remote sensing workflows because clouds can obscure the Earth's surface and reduce the usability of optical imagery. Early cloud detection can significantly reduce bandwidth requirements by preventing the downlink of unusable satellite data.
+## Dataset
 
-# 
+The dataset was collected from publicly available satellite imagery archives containing data from:
 
-# \---
+* **WorldView-1**
+* **GeoEye-1**
 
-# 
+### Dataset Statistics
 
-# \## Project Objectives
+| Property         | Value                     |
+| ---------------- | ------------------------- |
+| Total Images     | 2,500                     |
+| Image Type       | RGB Satellite Images      |
+| Resolution       | < 0.5 meters              |
+| Image Dimensions | 930 × 930 pixels          |
+| Annotation Type  | Binary Segmentation Masks |
 
-# 
+### Dataset Diversity
 
-# \### 1. Dataset Acquisition \& Annotation
+The dataset includes imagery from:
 
-# 
+* Multiple geographic regions
+* Different seasons
+* Various cloud conditions and densities
 
-# \* Curate a custom dataset from open-source satellite imagery archives.
+### Classes
 
-# \* Manually annotate cloud regions to create segmentation masks.
+| Class    | Description          |
+| -------- | -------------------- |
+| Cloud    | Cloud-covered pixels |
+| No Cloud | Clear-sky pixels     |
 
-# \* Prepare training-ready datasets for cloud segmentation.
+---
 
-# 
+## Model Architecture
 
-# \### 2. AI Model Development
+The cloud segmentation model follows an **Encoder–Decoder architecture** implemented using **TensorFlow** and **Keras**.
 
-# 
+### Training Configuration
 
-# \* Develop a deep learning model capable of accurately detecting and segmenting clouds in high-resolution satellite imagery.
+| Parameter         | Value        |
+| ----------------- | ------------ |
+| Output Activation | Sigmoid      |
+| Batch Size        | 4            |
+| Loss Function     | Jaccard Loss |
+| Optimizer         | Adam         |
+| Learning Rate     | 0.0001       |
 
-# \* Train and optimize the model using annotated datasets.
+---
 
-# 
+## Performance
 
-# \### 3. AI Model Inference
+| Metric         | Value         |
+| -------------- | ------------- |
+| IoU            | 0.80          |
+| Pixel Accuracy | 92%           |
+| Test Images    | 700           |
+| Inference Time | < 1 sec/image |
 
-# 
+---
 
-# \* Develop a deployment-ready inference module.
+## Project Structure
 
-# \* Automatically classify incoming images as:
+```text
+project/
+│
+├── inference.py
+├── env.yml
+│
+├── model/
+│   └── trained_model
+│
+├── dataset/
+│   ├── Train/
+│   ├── Validation/
+│   ├── Test/
+│   │   ├── Cloud/
+│   │   └── No_Cloud/
+│   └── Masks/
+│
+└── README.md
+```
 
-# 
+---
 
-# &#x20; \* \*\*Cloudy\*\*
+## Installation
 
-# &#x20; \* \*\*No Cloud\*\*
+### Create Conda Environment
 
-# 
+```bash
+conda env create -f env.yml
+```
 
-# \---
+### Activate Environment
 
-# 
+```bash
+conda activate cloudnet-env
+```
 
-# \## Dataset
+---
 
-# 
+## Test Dataset
 
-# \### Source Imagery
+A sample test dataset is available for evaluating the inference pipeline.
 
-# 
+### Download Test Data
 
-# The dataset was collected from open-source archives containing imagery from:
+Download the dataset from:
 
-# 
+**Google Drive:**
+https://drive.google.com/file/d/14xsvZyGJQTHZbECX4fvlUG8FGWDDoCx6/view?usp=sharing
 
-# \* WorldView-1
+After downloading, extract the files and place the images inside:
 
-# \* GeoEye-1
+```text
+dataset/Test/
+```
 
-# 
+---
 
-# provided by Maxar Technologies.
+## Running Inference
 
-# 
+### Step 1: Download and Extract Test Images
 
-# \### Dataset Characteristics
+Place the extracted test images inside:
 
-# 
+```text
+dataset/Test/
+```
 
-# | Property         | Value                     |
+### Step 2: Run Inference
 
-# | ---------------- | ------------------------- |
+```bash
+python inference.py
+```
 
-# | Total Images     | 2,500                     |
+---
 
-# | Image Type       | RGB Satellite Images      |
+## Output
 
-# | Resolution       | < 0.5 meters              |
+After inference, images are automatically categorized based on estimated cloud coverage.
 
-# | Image Dimensions | 930 × 930 pixels          |
+### Cloudy Images
 
-# | Annotation Tool  | CVAT                      |
+```text
+dataset/Test/Cloud/
+```
 
-# | Label Type       | Binary Segmentation Masks |
+Contains images with:
 
-# 
+```text
+Cloud Coverage ≥ 20%
+```
 
-# The dataset covers:
+### No Cloud Images
 
-# 
+```text
+dataset/Test/No_Cloud/
+```
 
-# \* Diverse geographic locations
+Contains images with:
 
-# \* Different seasons
+```text
+Cloud Coverage < 20%
+```
 
-# \* Various cloud conditions
+---
 
-# 
+## Cloud Classification Logic
 
-# Each image was manually annotated to generate cloud segmentation masks representing:
+The predicted cloud mask is used to estimate cloud coverage.
 
-# 
+| Cloud Coverage | Classification |
+| -------------- | -------------- |
+| ≥ 20%          | Cloudy         |
+| < 20%          | No Cloud       |
 
-# \* Cloud
+---
 
-# \* No Cloud
+## Processing Workflow
 
-# 
+```text
+Satellite Image
+       │
+       ▼
+ Deep Learning Model
+       │
+       ▼
+Cloud Segmentation Mask
+       │
+       ▼
+Cloud Coverage Estimation
+       │
+       ▼
+ ┌───────────────┬───────────────┐
+ │ Cloud ≥ 20%  │ Cloud < 20%   │
+ ▼              ▼
+Cloudy       No Cloud
+```
 
-# \---
+---
 
-# 
+## Conclusion
 
-# \## Model Architecture
+The AI-Based Cloud Detection system demonstrates the feasibility of deep learning-based cloud segmentation for high-resolution satellite imagery.
 
-# 
+### Key Results
 
-# The cloud detection model is based on a custom deep learning architecture following an \*\*Encoder–Decoder\*\* design.
+* **IoU:** 0.80
+* **Pixel Accuracy:** 92%
+* **Inference Time:** < 1 second per image
 
-# 
+These results validate the approach as a scalable solution for automated cloud detection and satellite image quality assessment.
 
-# \### Framework
+---
 
-# 
+## License
 
-# \* TensorFlow
-
-# \* Keras
-
-# 
-
-# \### Training Parameters
-
-# 
-
-# | Parameter         | Value        |
-
-# | ----------------- | ------------ |
-
-# | Output Activation | Sigmoid      |
-
-# | Batch Size        | 4            |
-
-# | Loss Function     | Jaccard Loss |
-
-# | Optimizer         | Adam         |
-
-# | Learning Rate     | 0.0001       |
-
-# 
-
-# \---
-
-# 
-
-# \## Model Evaluation
-
-# 
-
-# The model was evaluated using standard segmentation metrics.
-
-# 
-
-# \### Intersection over Union (IoU)
-
-# 
-
-# \[
-
-# IoU = \\frac{TP}{TP + FP + FN}
-
-# ]
-
-# 
-
-# Measures overlap between predicted cloud masks and ground-truth masks.
-
-# 
-
-# \### Accuracy
-
-# 
-
-# \[
-
-# Accuracy = \\frac{TP + TN}{TP + FP + TN + FN}
-
-# ]
-
-# 
-
-# Measures the percentage of correctly classified pixels.
-
-# 
-
-# \---
-
-# 
-
-# \## Results
-
-# 
-
-# The trained model achieved:
-
-# 
-
-# | Metric         | Value            |
-
-# | -------------- | ---------------- |
-
-# | IoU            | 0.80             |
-
-# | Accuracy       | 92%              |
-
-# | Test Images    | 700              |
-
-# | Inference Time | < 1 second/image |
-
-# 
-
-# \### Key Achievements
-
-# 
-
-# \* Accurate cloud segmentation
-
-# \* Fast inference performance
-
-# \* Reliable cloud coverage estimation
-
-# \* Effective Cloudy / No Cloud classification
-
-# 
-
-# \---
-
-# 
-
-# \## Cloud Classification Logic
-
-# 
-
-# The inference module estimates cloud coverage from the predicted segmentation mask.
-
-# 
-
-# \### Decision Rule
-
-# 
-
-# | Cloud Coverage | Classification |
-
-# | -------------- | -------------- |
-
-# | ≥ 20%          | Cloudy         |
-
-# | < 20%          | No Cloud       |
-
-# 
-
-# \---
-
-# 
-
-# \## Project Structure
-
-# 
-
-# ```text
-
-# project/
-
-# │
-
-# ├── inference.py
-
-# ├── env.yml
-
-# ├── model/
-
-# │   └── trained\_model
-
-# │
-
-# ├── dataset/
-
-# │   ├── Train/
-
-# │   ├── Validation/
-
-# │   ├── Test/
-
-# │   │   ├── Cloud/
-
-# │   │   └── No\_Cloud/
-
-# │   └── Masks/
-
-# │
-
-# └── README.md
-
-# ```
-
-# 
-
-# \---
-
-# 
-
-# \## Installation
-
-# 
-
-# \### Create Conda Environment
-
-# 
-
-# ```bash
-
-# conda env create -f env.yml
-
-# ```
-
-# 
-
-# \### Activate Environment
-
-# 
-
-# ```bash
-
-# conda activate cloudnet-env
-
-# ```
-
-# 
-
-# \---
-
-# 
-
-# \## Running Inference
-
-# 
-
-# \### Step 1
-
-# 
-
-# Place test images inside:
-
-# 
-
-# ```text
-
-# dataset/Test/
-
-# ```
-
-# 
-
-# \### Step 2
-
-# 
-
-# Run inference:
-
-# 
-
-# ```bash
-
-# python inference.py
-
-# ```
-
-# 
-
-# \---
-
-# 
-
-# \## Output
-
-# 
-
-# After execution, images will automatically be categorized into:
-
-# 
-
-# \### Cloudy Images
-
-# 
-
-# ```text
-
-# Test/Cloud/
-
-# ```
-
-# 
-
-# Contains images with:
-
-# 
-
-# ```text
-
-# Cloud Coverage ≥ 20%
-
-# ```
-
-# 
-
-# \### No Cloud Images
-
-# 
-
-# ```text
-
-# Test/No\_Cloud/
-
-# ```
-
-# 
-
-# Contains images with:
-
-# 
-
-# ```text
-
-# Cloud Coverage < 20%
-
-# ```
-
-# 
-
-# \---
-
-# 
-
-# \## Sample Workflow
-
-# 
-
-# ```text
-
-# Input Satellite Image
-
-# &#x20;         │
-
-# &#x20;         ▼
-
-# &#x20;  Deep Learning Model
-
-# &#x20;         │
-
-# &#x20;         ▼
-
-# &#x20;  Cloud Segmentation Mask
-
-# &#x20;         │
-
-# &#x20;         ▼
-
-# &#x20;Cloud Percentage Estimation
-
-# &#x20;         │
-
-# &#x20;         ▼
-
-# &#x20;┌───────────────┬───────────────┐
-
-# &#x20;│ Cloud ≥ 20%   │ Cloud < 20%   │
-
-# &#x20;▼               ▼
-
-# &#x20;Cloudy        No Cloud
-
-# ```
-
-# 
-
-# \---
-
-# 
-
-# \## Future Work
-
-# 
-
-# This project currently serves as a \*\*Proof of Concept (POC)\*\* and forms the foundation for future development under the \*\*Sat-AI\*\* initiative.
-
-# 
-
-# Planned improvements include:
-
-# 
-
-# \* Expansion of training datasets
-
-# \* Improved model accuracy
-
-# \* Faster inference performance
-
-# \* Real-time deployment optimization
-
-# \* Integration into operational satellite workflows
-
-# \* Edge deployment for onboard processing
-
-# 
-
-# \---
-
-# 
-
-# \## Conclusion
-
-# 
-
-# The developed AI-based cloud detection system demonstrates strong performance in satellite image cloud segmentation, achieving an \*\*IoU of 0.80\*\* and \*\*92% pixel accuracy\*\* while maintaining \*\*sub-second inference times\*\*.
-
-# 
-
-# The project successfully validates the feasibility of using deep learning for automated cloud detection and establishes a scalable foundation for future satellite intelligence applications.
-
-# 
-
-# \---
-
-# 
-
-# \## License
-
-# 
-
-# This project is intended for research and development purposes.
-
-# 
-
-# \## Authors
-
-# 
-
-# Developed as part of the \*\*AI Based Cloud Detection – POC\*\* R\&D Project.
-
-
-
+This project is intended for **research and development purposes**.
