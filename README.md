@@ -25,14 +25,6 @@ The dataset was collected from publicly available satellite imagery archives con
 | Image Dimensions | 930 × 930 pixels          |
 | Annotation Type  | Binary Segmentation Masks |
 
-### Dataset Diversity
-
-The dataset includes imagery from:
-
-* Multiple geographic regions
-* Different seasons
-* Various cloud conditions and densities
-
 ### Classes
 
 | Class    | Description          |
