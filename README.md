@@ -1,12 +1,10 @@
-# ☁️ AI-Based Cloud Detection for Satellite Imagery
+# AI-Based Cloud Detection for Satellite Imagery
 
 ## Overview
 
 **AI-Based Cloud Detection** is a deep learning-based cloud segmentation and classification system designed for high-resolution optical satellite imagery.
 
 The solution automatically detects cloud-covered regions and classifies satellite images as **Cloudy** or **No Cloud** before downstream processing or transmission.
-
-Cloud detection is a critical preprocessing step in remote sensing workflows, as cloud cover can obscure surface information and reduce the usability of optical imagery. Early cloud identification enables more efficient data processing, storage, and transmission.
 
 ---
 
