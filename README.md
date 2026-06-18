@@ -114,7 +114,7 @@ conda activate cloudnet-env
 A sample test dataset is available for evaluating the inference pipeline.
 
 ### Download Test Data
-**Test Dataset:** [Google Drive Download](https://drive.google.com/file/d/14xsvZyGJQTHZbECX4fvlUG8FGWDDoCx6/view?usp=sharing)
+**Test Dataset:** [Google Drive Download](https://drive.google.com/file/d/14xsvZyGJQTHZbECX4fvlUG8FGWDDoCx6/view?usp=drive_link)
 
 After downloading, extract the files and place the images inside:
 
